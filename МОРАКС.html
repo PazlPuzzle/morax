@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090909" />
+  <title>Запретный фолиант</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #271a15;
+      --rust: #63372b;
+      --paper: #c6b58e;
+      --paper-light: #ddcda7;
+      --paper-dark: #9e8964;
+      --night: #080808;
+      --red: #6f1714;
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      overflow-x: hidden;
+      color: #d7c8a6;
+      background:
+        radial-gradient(ellipse at 50% 44%, rgba(75,65,57,.28), transparent 42%),
+        radial-gradient(ellipse at 18% 80%, rgba(45,40,38,.18), transparent 32%),
+        radial-gradient(ellipse at 85% 20%, rgba(58,49,43,.15), transparent 35%),
+        linear-gradient(135deg, #11100f, #050505 62%, #0d0b0a);
+      font-family: "Cinzel", Georgia, serif;
+      padding: 28px 14px;
+    }
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      opacity: .18;
+      background:
+        radial-gradient(ellipse at 15% 40%, #8b8275 0, transparent 20%),
+        radial-gradient(ellipse at 78% 63%, #665b51 0, transparent 23%),
+        radial-gradient(ellipse at 50% 15%, #5a534b 0, transparent 18%);
+      filter: blur(42px);
+      animation: ashDrift 18s ease-in-out infinite alternate;
+    }
+    body::after {
+      opacity: .18;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+    @keyframes ashDrift { to { transform: translate(4%, -3%) scale(1.08); } }
+    .scene {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 980px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      perspective: 1800px;
+    }
+    .eyebrow {
+      margin: 0;
+      color: #81735f;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      font-size: .66rem;
+      text-align: center;
+    }
+    .book-stage {
+      position: relative;
+      width: min(92vw, 760px);
+      height: clamp(360px, 62vw, 500px);
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 35px 24px rgba(0,0,0,.7));
+    }
+    .book {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 1.2s cubic-bezier(.2,.72,.2,1);
+    }
+    .book.open { transform: translateX(0); }
+    .book-base {
+      position: absolute;
+      inset: 0;
+      border-radius: 5px 11px 11px 5px;
+      background: linear-gradient(90deg, #211c18, #514334 2%, #171411 4%, #0b0a09 50%, #211b16 98%, #080706);
+      box-shadow: inset 0 0 0 1px rgba(193,166,117,.14), 0 0 0 2px #050505;
+      opacity: 0;
+      transition: opacity .5s .25s;
+    }
+    .book.open .book-base { opacity: 1; }
+    .spread {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      overflow: hidden;
+      opacity: 0;
+      transform: rotateY(-2deg) scale(.97);
+      transition: opacity .6s .35s, transform .8s .25s;
+      pointer-events: none;
+      border-radius: 4px;
+    }
+    .book.open .spread {
+      opacity: 1;
+      transform: rotateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .page {
+      position: relative;
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+      padding: clamp(22px, 4vw, 43px) clamp(18px, 4vw, 38px);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 9% 12%, rgba(83,52,31,.19), transparent 20%),
+        radial-gradient(ellipse at 92% 83%, rgba(91,45,25,.2), transparent 22%),
+        radial-gradient(ellipse at 55% 45%, rgba(255,245,209,.25), transparent 56%),
+        repeating-linear-gradient(0deg, rgba(73,52,30,.035) 0 1px, transparent 1px 4px),
+        linear-gradient(100deg, #a99670, var(--paper-light) 17%, var(--paper) 80%, #a38c63);
+      box-shadow: inset 0 0 22px rgba(47,29,17,.3);
+      font-family: "IM Fell English", Georgia, serif;
+      line-height: 1.5;
+      font-size: clamp(12px, 1.55vw, 15px);
+    }
+    .page.left { border-radius: 4px 0 0 4px; }
+    .page.right { border-radius: 0 4px 4px 0; }
+    .page.left::after, .page.right::after {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; width: 18px;
+      pointer-events: none;
+    }
+    .page.left::after { right: 0; background: linear-gradient(90deg, transparent, rgba(34,20,12,.23)); }
+    .page.right::after { left: 0; background: linear-gradient(90deg, rgba(34,20,12,.22), transparent); }
+    .page h2 {
+      margin: 0 0 19px;
+      text-align: center;
+      font-family: "Cinzel", Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(15px, 2vw, 20px);
+      letter-spacing: .18em;
+      color: #40241b;
+      text-shadow: 0 1px rgba(255,241,204,.4);
+    }
+    .page p { margin: 0 0 12px; }
+    .faded { color: #603d2d; }
+    .riddle { font-style: italic; color: #512d24; }
+    .cutoff { letter-spacing: .03em; }
+    .scratched { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: #6d2a21; }
+    .blood-smear {
+      position: absolute;
+      right: 7%; bottom: 4%;
+      width: 58%; height: 25%;
+      background:
+        radial-gradient(ellipse at 50% 45%, rgba(54,8,8,.93) 0 13%, rgba(78,13,12,.82) 26%, rgba(91,19,15,.55) 44%, transparent 71%),
+        radial-gradient(ellipse at 30% 68%, rgba(45,5,7,.8), transparent 35%),
+        radial-gradient(ellipse at 77% 18%, rgba(72,10,11,.72), transparent 30%);
+      filter: blur(2px);
+      transform: rotate(-13deg);
+      opacity: .92;
+      pointer-events: none;
+    }
+    .blood-smear::before, .blood-smear::after {
+      content: "";
+      position: absolute;
+      width: 8px; height: 30px;
+      background: linear-gradient(#5c100e, #35100d);
+      border-radius: 50% 50% 60% 60%;
+      top: 60%; left: 24%;
+      transform: rotate(15deg);
+      box-shadow: 29px 6px 0 -2px #4c0d0d, 70px -4px 0 -3px #4c0d0d;
+    }
+    .blood-smear::after { top: 80%; left: 60%; height: 20px; transform: rotate(-10deg); }
+    .page-number {
+      position: absolute;
+      bottom: 12px;
+      left: 0; right: 0;
+      text-align: center;
+      color: rgba(55,35,22,.55);
+      font-size: 11px;
+      font-style: italic;
+    }
+    .cover {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      border-radius: 4px 11px 11px 4px;
+      background:
+        radial-gradient(ellipse at 50% 35%, rgba(65,58,49,.23), transparent 48%),
+        repeating-linear-gradient(12deg, transparent 0 8px, rgba(255,255,255,.012) 9px, transparent 11px),
+        repeating-linear-gradient(91deg, rgba(0,0,0,.15) 0 2px, transparent 3px 9px),
+        linear-gradient(105deg, #080807, #171512 38%, #090908 70%, #030303);
+      border: 1px solid #30281f;
+      box-shadow: inset 7px 0 14px rgba(0,0,0,.9), inset -4px 0 10px rgba(0,0,0,.8), inset 0 0 0 7px rgba(37,31,24,.45), 9px 5px 16px rgba(0,0,0,.55);
+      display: grid;
+      place-items: center;
+      transition: transform 1.3s cubic-bezier(.65,0,.2,1), opacity .5s .55s, visibility .5s .55s;
+      backface-visibility: hidden;
+      user-select: none;
+    }
+    .cover::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(130,105,69,.22);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.7);
+      border-radius: 2px 7px 7px 2px;
+    }
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='.3'/%3E%3C/svg%3E");
+      opacity: .22;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .cover.opening {
+      transform: rotateY(-158deg);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .cover-mark {
+      position: relative;
+      z-index: 1;
+      font-family: Georgia, serif;
+      font-size: clamp(78px, 13vw, 130px);
+      font-weight: 400;
+      line-height: 1;
+      color: rgba(166, 34, 28, .58);
+      text-shadow: 0 0 5px rgba(111,15,12,.32), 0 0 22px rgba(112,12,10,.18);
+      animation: pulse 4.2s ease-in-out infinite;
+      transform: scaleX(.9);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: .55; text-shadow: 0 0 4px rgba(111,15,12,.2), 0 0 14px rgba(112,12,10,.13); }
+      50% { opacity: .9; text-shadow: 0 0 8px rgba(150,23,18,.45), 0 0 30px rgba(112,12,10,.3); }
+    }
+    .cover-title {
+      position: absolute;
+      bottom: 13%;
+      z-index: 1;
+      color: rgba(168,147,111,.42);
+      font-size: clamp(9px, 1.2vw, 12px);
+      letter-spacing: .35em;
+      text-transform: uppercase;
+    }
+    .cover-hint {
+      position: absolute;
+      bottom: -40px;
+      width: 100%;
+      text-align: center;
+      color: #6d6254;
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      animation: hint 2.5s ease-in-out infinite;
+    }
+    @keyframes hint { 50% { opacity: .4; } }
+    .controls {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: 1px solid #463a2d;
+      background: linear-gradient(#171411, #090908);
+      color: #a99a7e;
+      padding: 10px 15px;
+      font: 10px "Cinzel", Georgia, serif;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, transform .2s;
+    }
+    button:hover { color: #e0cfaa; border-color: #80674b; }
+    button:active { transform: translateY(1px); }
+    button:focus-visible, .cover:focus-visible { outline: 2px solid #8b2922; outline-offset: 4px; }
+    button:disabled { opacity: .28; cursor: not-allowed; }
+    .status {
+      min-height: 18px;
+      color: #8d332a;
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .hidden-pages {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      z-index: 3;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+    .hidden-pages.visible { opacity: 1; }
+    .ghost-page {
+      width: 50%;
+      background:
+        radial-gradient(ellipse at 62% 67%, rgba(65,5,6,.8) 0 7%, rgba(84,12,12,.5) 20%, transparent 44%),
+        radial-gradient(ellipse at 24% 21%, rgba(85,10,12,.65), transparent 22%),
+        radial-gradient(ellipse at 83% 32%, rgba(54,7,8,.65), transparent 17%),
+        linear-gradient(110deg, #a08c68, #d1c09a 25%, #b6a17b 75%, #8f7958);
+      box-shadow: inset 0 0 22px rgba(47,29,17,.5);
+      position: relative;
+    }
+    .ghost-page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .45;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E");
+    }
+    .hidden-whisper {
+      position: absolute;
+      z-index: 2;
+      inset: 12% 9%;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      text-align: center;
+      color: #3b100e;
+      font: 600 clamp(13px, 2.1vw, 22px)/1.7 "Cinzel", Georgia, serif;
+      letter-spacing: .12em;
+      text-shadow: 0 1px rgba(235,207,163,.35), 0 0 12px rgba(65,0,0,.18);
+      opacity: 0;
+      transform: scale(.97);
+      transition: opacity .18s, transform .18s;
+      white-space: pre-line;
+      pointer-events: none;
+    }
+    .hidden-pages.visible .hidden-whisper {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .hidden-whisper.rare {
+      color: #260504;
+      font-size: clamp(12px, 1.8vw, 19px);
+      text-shadow: 0 0 7px rgba(106,0,0,.4);
+    }
+    .locked .spread { filter: brightness(.7) saturate(.65); }
+    .locked .page { box-shadow: inset 0 0 35px rgba(35,0,0,.55); }
+    .lock-flash { animation: lockFlash .45s ease; }
+    @keyframes lockFlash { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-4px) rotateZ(-.2deg); } 45% { transform: translateX(4px); } 70% { transform: translateX(-2px); } }
+    .footnote { color: #4f4941; font: 10px Georgia, serif; text-align: center; }
+    @media (max-width: 540px) {
+      body { padding: 28px 8px 20px; }
+      .book-stage { width: 96vw; height: min(122vw, 570px); }
+      .page { padding: 19px 12px 28px; font-size: clamp(10px, 2.7vw, 12px); line-height: 1.42; }
+      .page h2 { font-size: clamp(12px, 3.2vw, 15px); letter-spacing: .1em; margin-bottom: 12px; }
+      .page p { margin-bottom: 9px; }
+      .cover::before { inset: 12px; }
+      .cover-title { letter-spacing: .18em; }
+      .controls { gap: 6px; }
+      button { padding: 9px 10px; font-size: 9px; }
+      .cover-hint { bottom: -32px; font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene">
+    <p class="eyebrow">⋉⍜⍙⊑⊬⍙☍⍙⏚ ⍙⌿⍙⎍⌇</p>
+    <div class="book-stage" aria-label="Древняя книга">
+      <div class="book" id="book">
+        <div class="book-base"></div>
+        <div class="spread" id="spread">
+          <article class="page left">
+            <h2>Г Р А Н Ь</h2>
+            <p class="faded">Не ищи ее на картах ибо она не имеет стен но она разделяет миры. День и Ночь это лишь отражения правды, истина же в трещине между ними.</p>
+            <p>Ты проходишь сквозь нее каждый раз когда меняется свет. Но знаешь ли ты что остается позади? Нет?</p>
+            <p class="riddle">Закон не терпит их.<br>А что оставляют путники, когда их тени касаются друг друга?</p>
+            <p class="riddle">Почему вечером тень длиннее, чем утром?</p>
+            <p class="faded cutoff">Если однажды ты услышишь шаги по ту сторону стекла о не оборачивайся, ибо тот кто идет за тобой, уже...</p>
+            <span class="page-number">I</span>
+          </article>
+          <article class="page right">
+            <h2>О С О З Н А Н Н Ы Е</h2>
+            <p>Не рождались, а собрались.<br>Осколки чужих снов, молитв и последних вздохов.</p>
+            <p>Среди них есть те кто потерял разум <span class="scratched">пытаются выбраться.</span></p>
+            <p>И те кто потерял душу, но они холодны как камень.</p>
+            <p>Но один...<br>Один увидел. И он понял.<br>Он не был ни разумом ни душой, но был другим.</p>
+            <p>Носит чужое лицо. Говорит чужим голосом. И хочет открыть дверь которую ни в коем случае нельзя открывать.</p>
+            <p>Если он предложит тебе свободу то ты спроси: "какой ценой?"</p>
+            <div class="blood-smear" aria-hidden="true"></div>
+            <span class="page-number">II</span>
+          </article>
+        </div>
+        <div class="hidden-pages" id="hiddenPages" aria-hidden="true">
+          <div class="ghost-page"></div>
+          <div class="ghost-page"></div>
+          <div class="hidden-whisper" id="hiddenWhisper">ЗАПРЕЩЕНО</div>
+        </div>
+        <div class="cover" id="cover" role="button" tabindex="0" aria-label="Открыть древнюю книгу">
+          <div class="cover-mark">◇</div>
+          <div class="cover-title">Грань · Запретный фолиант</div>
+          <div class="cover-hint">Коснись, чтобы открыть</div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="prevBtn" disabled>← Назад</button>
+      <button id="openBtn">Открыть книгу</button>
+      <button id="nextBtn" disabled>Дальше →</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite">Обложка запечатана</div>
+    <p class="footnote">Некоторые слова лучше оставить непрочитанными.</p>
+  </main>
+  <script>
+    (() => {
+      const book = document.getElementById('book');
+      const cover = document.getElementById('cover');
+      const openBtn = document.getElementById('openBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const status = document.getElementById('status');
+      const hiddenPages = document.getElementById('hiddenPages');
+      const hiddenWhisper = document.getElementById('hiddenWhisper');
+      let isOpen = false;
+      let locked = false;
+      let lockTimer;
+
+      const ordinaryWarnings = [
+        'НЕ ВЗДУМАЙ... ТЕБЕ ЭТО НЕ НАДО',
+        'СМИРИСЬ...',
+        'ДАЛЬШЕ НЕТ НИЧЕГО',
+        'ПОДУМАЙ ЕЩЁ РАЗ. ОНО ТЕБЕ НАДО?',
+        'ЛУЧШЕ ОСТАВИТЬ ЭТО В ПОКОЕ'
+      ];
+      const defaultWarning = 'ЗАПРЕЩЕНО';
+      const rareWarning = 'ЗАПОМНИ КОЕ-ЧТО ВАЖНОЕ...\nОН ЛЮБОЙ ЦЕНОЙ ОСВОБОДИТ ИХ.\nОСТАНОВИ ЕГО.';
+      function chooseWarning() {
+        const isRare = Math.random() < 0.15;
+        hiddenWhisper.textContent = isRare
+          ? rareWarning
+          : (Math.random() < 0.2
+              ? defaultWarning
+              : ordinaryWarnings[Math.floor(Math.random() * ordinaryWarnings.length)]);
+        hiddenWhisper.classList.toggle('rare', isRare);
+      }
+
+      function openBook() {
+        if (isOpen) return;
+        isOpen = true;
+        cover.classList.add('opening');
+        book.classList.add('open');
+        openBtn.textContent = 'Книга открыта';
+        openBtn.disabled = true;
+        prevBtn.disabled = false;
+        nextBtn.disabled = false;
+        status.textContent = 'Страницы I–II · Не читай вслух';
+      }
+      function closeBook() {
+        if (!isOpen) return;
+        isOpen = false;
+        cover.classList.remove('opening');
+        book.classList.remove('open', 'locked');
+        hiddenPages.classList.remove('visible');
+        hiddenWhisper.classList.remove('rare');
+        openBtn.textContent = 'Не открывай';
+        openBtn.disabled = false;
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        status.textContent = 'Обложка запечатана';
+      }
+      function showLock() {
+        if (!isOpen || locked) return;
+        locked = true;
+        chooseWarning();
+        book.classList.add('locked', 'lock-flash');
+        hiddenPages.classList.add('visible');
+        status.textContent = 'СТРАНИЦА ЗАПЕЧАТАНА';
+        nextBtn.textContent = 'Запечатано ◈';
+        nextBtn.disabled = true;
+        window.clearTimeout(lockTimer);
+        lockTimer = window.setTimeout(() => {
+          book.classList.remove('locked', 'lock-flash');
+          hiddenPages.classList.remove('visible');
+          hiddenWhisper.classList.remove('rare');
+          nextBtn.textContent = 'Дальше →';
+          nextBtn.disabled = false;
+          status.textContent = 'Страница III недоступна';
+          locked = false;
+        }, 4000); 
+      }
+      cover.addEventListener('click', openBook);
+      cover.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBook(); }
+      });
+      openBtn.addEventListener('click', openBook);
+      prevBtn.addEventListener('click', closeBook);
+      nextBtn.addEventListener('click', showLock);
+    })();
+  </script>
+</body>
+</html>
